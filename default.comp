@@ -1,0 +1,47 @@
+#version 460 core
+
+#define NUMERIC double
+
+layout(local_size_x = 8, local_size_y = 4, local_size_z = 1) in;
+layout(rgba32f, binding = 0) uniform image2D screen;
+
+void main()
+{
+	vec4 pixel = vec4(0.0f, 0.0f, 0.0f, 1.0);
+	ivec2 pixel_coords = ivec2(gl_GlobalInvocationID.xy);
+
+	// get value stored in the image
+    NUMERIC scale = 1.0;
+	NUMERIC xpos = 0.0;
+	NUMERIC ypos = 0.0;
+	int maxIter = 128;
+	
+	ivec2 dims = imageSize(screen);
+	NUMERIC x0 = -xpos-(NUMERIC(pixel_coords.x * 2 - dims.x) / dims.x * scale); // transforms to [-1.0, 1.0]
+	NUMERIC y0 = -ypos-(NUMERIC(pixel_coords.y * 2 - dims.y) / dims.y * scale); // transforms to [-1.0, 1.0]
+
+	NUMERIC tx;
+	NUMERIC x = 0;
+	NUMERIC y = 0;
+	int iter = 0;
+	while (iter < maxIter)
+	{
+		tx = x;
+		x = x*x - y*y + x0;
+		y = 2*tx*y + y0;
+
+		if (x*x+y*y > 4.0f)
+		{
+			break;
+		}
+		iter++;
+	}	
+
+	if (iter < maxIter)
+	{
+		//pixel = vec4((normalize(intersection - sphere_c) + 1.0) / 2.0, 1.0);
+		NUMERIC c = NUMERIC(iter) / maxIter;
+		pixel = vec4(c,c,c,1.0);
+	}
+	imageStore(screen, pixel_coords, pixel);
+}
