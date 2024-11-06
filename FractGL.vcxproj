@@ -167,7 +167,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="computeShaderClass.h" />
-    <ClInclude Include="DrawText.h" />
     <ClInclude Include="EBO.h" />
     <ClInclude Include="KHR\khrplatform.h" />
     <ClInclude Include="Libraries\include\glad\glad.h" />

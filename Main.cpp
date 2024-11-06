@@ -29,7 +29,7 @@ namespace fs = std::filesystem;
 #define SCREEN_WIDTH 1024
 #define SCREEN_HEIGHT 1024
 
-bool vSync = true;
+bool vSync = false;
 
 // Vertices coordinates
 GLfloat vertices[] =
@@ -47,6 +47,13 @@ GLuint indices[] =
 	0, 2, 1, // Upper triangle
 	0, 3, 2 // Lower triangle
 };
+
+std::string toString(double d)
+{
+	std::ostringstream strs;
+	strs << d;
+	return strs.str();
+}
 
 
 std::string LoadTextFileFromResource(int resourceID, HINSTANCE hInstance, int* errorNo)
@@ -196,10 +203,10 @@ int main()
 	bool reset = true;
 	bool zooming = false;
 
-	double scale = 1.5f;
-	double xPos = 0.7f;
-	double yPos = 0.0f;
-	double scaleSpeed = 1.5f;
+	double scale = 1.5;
+	double xPos = 0.7;
+	double yPos = 0.0;
+	double scaleSpeed = 1.5;
 	int iterations = 128;
 	bool freeRun = true;
 
@@ -266,7 +273,7 @@ int main()
 			iterations <<= 1;
 			if (!zooming)
 			{
-				scaleSpeed = 1.0f;
+				scaleSpeed = 1.0;
 				zooming = true;
 				clear = true;
 				draw = true;
@@ -279,7 +286,7 @@ int main()
 				iterations >>= 1;
 				if (!zooming)
 				{
-					scaleSpeed = 1.0f;
+					scaleSpeed = 1.0;
 					zooming = true;
 					clear = true;
 					draw = true;
@@ -288,14 +295,14 @@ int main()
 			}
 			break;
 		case WH_ZOOM_IN:
-			scaleSpeed = 0.99f;
+			scaleSpeed = 0.99;
 			zooming = true;
 			clear = true;
 			draw = true;
 			reset = false;
 			break;
 		case WH_ZOOM_OUT:
-			scaleSpeed = 1 / 0.99f;
+			scaleSpeed = 1 / 0.99;
 			zooming = true;
 			clear = true;
 			draw = true;
@@ -314,18 +321,20 @@ int main()
 			{
 				EmptyClipboard();
 				
-				std::wstring strData = std::to_wstring(xPos) + L" " + std::to_wstring(yPos) + L" " + std::to_wstring(scale) + L" " + std::to_wstring(iterations);
+				std::string strData = toString(xPos) + " " + toString(yPos) + " " + toString(scale) + " " + toString(iterations);
 				int sz = sizeof(WCHAR) * strData.length() + 1;
 				HGLOBAL hClipboardData = GlobalAlloc(GMEM_DDESHARE, sz);
 
 				if (hClipboardData != nullptr)
 				{
-					WCHAR* pchData;
-					pchData = (WCHAR*)GlobalLock(hClipboardData);
-					wcscpy_s(pchData, sz, strData.c_str());
-					GlobalUnlock(hClipboardData);
-					SetClipboardData(CF_UNICODETEXT, hClipboardData);
-
+					char* pchData;
+					pchData = (char*)GlobalLock(hClipboardData);
+					if (pchData != nullptr)
+					{
+						strcpy_s(pchData, sz, strData.c_str());
+						GlobalUnlock(hClipboardData);
+						SetClipboardData(CF_TEXT, hClipboardData);
+					}
 				}
 				CloseClipboard();
 			}
@@ -334,25 +343,25 @@ int main()
 			//HWND handle = glfwGetWin32Window(window);
 			if (OpenClipboard(nullptr))
 			{
-				HANDLE hClipbpardData = GetClipboardData(CF_UNICODETEXT);
+				HANDLE hClipbpardData = GetClipboardData(CF_TEXT);
 				if (hClipbpardData != nullptr)
 				{
-					WCHAR* pszText = static_cast<WCHAR*>(GlobalLock(hClipbpardData));
+					char* pszText = static_cast<char*>(GlobalLock(hClipbpardData));
 					if (pszText != nullptr)
 					{
-						std::wstring temp;
-						std::wstring coordString(pszText);
+						std::string temp;
+						std::string coordString(pszText);
 
 						std::vector<double> parts;
-						std::wstringstream wss(coordString);
-						while (std::getline(wss, temp, L' '))
+						std::stringstream wss(coordString);
+						while (std::getline(wss, temp, ' '))
 						{
 							parts.push_back(std::stod(temp));
 						}
 
 						if (parts.size() > 3)
 						{
-							scaleSpeed = 1.0f;
+							scaleSpeed = 1.0;
 							xPos = parts[0];
 							yPos = parts[1];
 							scale = parts[2];
@@ -372,13 +381,13 @@ int main()
 
 		if (zooming)
 		{
-			double selXPos = ((windowHandler.xPos / (double)SCREEN_WIDTH) * 2.0f - 1.0f) * scale;
-			double selYPos = ((windowHandler.yPos / (double)SCREEN_HEIGHT) * 2.0f - 1.0f) * -scale;
+			double selXPos = ((windowHandler.xPos / (double)SCREEN_WIDTH) * 2.0 - 1.0) * scale;
+			double selYPos = ((windowHandler.yPos / (double)SCREEN_HEIGHT) * 2.0 - 1.0) * -scale;
 
 			scale *= scaleSpeed;
 
-			double selXPos2 = ((windowHandler.xPos / (double)SCREEN_WIDTH) * 2.0f - 1.0f) * scale;
-			double selYPos2 = ((windowHandler.yPos / (double)SCREEN_HEIGHT) * 2.0f - 1.0f) * -scale;
+			double selXPos2 = ((windowHandler.xPos / (double)SCREEN_WIDTH) * 2.0 - 1.0) * scale;
+			double selYPos2 = ((windowHandler.yPos / (double)SCREEN_HEIGHT) * 2.0 - 1.0) * -scale;
 
 			xPos += (selXPos - selXPos2);
 			yPos += (selYPos - selYPos2);

@@ -59,11 +59,12 @@ bool replace(std::string& str, const std::string& from, const std::string& to) {
 
 void ComputeShader::ReadShader()
 {
+
 	// Update shader code
 	std::string computeCode = computeCodeBuffer;
-	replace(computeCode, "NUMERIC scale = 1.0;", "NUMERIC scale = " + std::to_string(scale) + ";");
-	replace(computeCode, "NUMERIC xpos = 0.0;", "NUMERIC xpos = " + std::to_string(xPos) + ";");
-	replace(computeCode, "NUMERIC ypos = 0.0;", "NUMERIC ypos = " + std::to_string(yPos) + ";");
+	replace(computeCode, "NUMERIC scale = 1.0;", "NUMERIC scale = " + toString(scale) + ";");
+	replace(computeCode, "NUMERIC xpos = 0.0;", "NUMERIC xpos = " + toString(xPos) + ";");
+	replace(computeCode, "NUMERIC ypos = 0.0;", "NUMERIC ypos = " + toString(yPos) + ";");
 	replace(computeCode, "int maxIter = 128;", "int maxIter = " + std::to_string(iterations) + ";");
 
 	const char* computeSource = computeCode.c_str();

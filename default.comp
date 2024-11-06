@@ -39,9 +39,7 @@ void main()
 
 	if (iter < maxIter)
 	{
-		//pixel = vec4((normalize(intersection - sphere_c) + 1.0) / 2.0, 1.0);
-		NUMERIC c = NUMERIC(iter) / maxIter;
-		pixel = vec4(c,c,c,1.0);
+		pixel = vec4(iter, maxIter, 0.0, 0.0);
 	}
 	imageStore(screen, pixel_coords, pixel);
 }

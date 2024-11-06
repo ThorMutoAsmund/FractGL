@@ -12,6 +12,7 @@
 
 //std::string get_file_contents(const char* filename, int *errorNo);
 std::string LoadTextFileFromResource(int resourceID, HINSTANCE hInstance, int* errorNo);
+std::string toString(double d);
 
 class ComputeShader
 {
